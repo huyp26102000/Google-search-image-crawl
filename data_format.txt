@@ -1,0 +1,6 @@
+#<label> <x> <y> <width> <height>
+
+<label> : label of images
+<x> <xy>: coordinate of center of the bounding box
+<width> : the width of bounding box
+<height>: the height of bounding box

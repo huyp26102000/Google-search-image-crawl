@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "cheerio": "^1.0.0-rc.10",
+    "cli-spinners": "^2.6.1",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "image-downloader": "^4.0.3",
+    "image-to-base64": "^2.2.0",
+    "images-scraper": "^6.4.0",
+    "lodash": "^4.17.21",
+    "md5": "^2.3.0",
+    "node-wget": "^0.4.3",
+    "ora": "^6.1.0",
+    "puppeteer": "^13.5.1",
+    "react-native-uuid": "^2.0.1",
+    "sqlite3": "^5.0.2",
+    "url": "^0.11.0",
+    "uuid": "^8.3.2",
+    "uuid4": "^2.0.2"
+  }
+}
