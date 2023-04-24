@@ -41,7 +41,7 @@ const getImageUrl = async (key, level, dataDB) => {
     "\x1b[36m%s\x1b[0m",
     `Found ${level1ImagesRef.length} result at level 1 !`
   );
-  const listLv2Url = await Action.goToRefLocation(page, level1ImagesRef.slice(0, 100));
+  const listLv2Url = await Action.goToRefLocation(page, level1ImagesRef);
   if (listLv2Url?.length > 0) {
     const crawlResult = await Action.getLevel2RefAddress(
       page,
