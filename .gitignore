@@ -3,5 +3,5 @@ npm-debug.log
 yarn-error.log
 helpers/database/database.db
 download/
-# !helpers/download
+!helpers/download
 helpers/database/database.db-journal
