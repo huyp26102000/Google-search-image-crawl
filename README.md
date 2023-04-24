@@ -1,5 +1,8 @@
 ## Google image crawler
 
+Download images including urls from Google with given keyword
+Support crawl images from both search image results and from pages when the "view more" button is pressed for each image
+
 ### Step by Step 
 
 Step 1: Clone project \
