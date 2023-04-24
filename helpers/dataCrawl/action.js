@@ -84,16 +84,23 @@ const getLevel1RefAddress = async (page) => {
 
 const getLoadmoreButton = async (links) => {
   return new Promise(async (resolve) => {
+    let count = 0;
     for (let i = 0; i < links.length; i++) {
-      const textContent = await links[i].evaluate((link) =>
-        link.textContent.trim()
-      );
-      if (textContent === "See more") {
-        const href = await links[i].getProperty("href");
-        const hrefValue = await href.jsonValue();
-        resolve(hrefValue);
+      try {
+        const textContent = await links[i].evaluate((link) =>
+          link.textContent.trim()
+        );
+        if (textContent === "See more") {
+          const href = await links[i].getProperty("href");
+          const hrefValue = await href.jsonValue();
+          resolve(hrefValue);
+        }
+      } catch (error) {
+        console.log(error);
       }
+      count++;
     }
+    if (count == links.length) resolve();
   });
 };
 
@@ -102,40 +109,45 @@ const goToRefLocation = async (page, address) => {
   let finish = 1;
   await new Promise(async (resolve) => {
     for (let index = 0; index < address?.length; index++) {
-      await console.log(
-        "\x1b[36m%s\x1b[0m",
-        `Getting loadmore url...${index}/${address.length}`
-      );
-      if (address[index]) {
-        try {
-          page.setDefaultNavigationTimeout(60000);
-          await page.goto(`https://www.google.com${address[index]}`, {
-            waitUntil: "networkidle2",
-            timeout: 0,
-          });
-          await waitTillHTMLRendered(page);
-          const links = await page.$$("a");
-          const viewMoreUrl = await getLoadmoreButton(links);
-          if (viewMoreUrl) {
-            listUrlLv2.push(viewMoreUrl);
-            console.log("\x1b[32m%s\x1b[0m", `Added 1 ref url`);
-          } else {
-            listUrlLv2.push(undefined);
+      try {
+        await console.log(
+          "\x1b[36m%s\x1b[0m",
+          `Getting loadmore url...${index}/${address.length}`
+        );
+        if (address[index]) {
+          try {
+            page.setDefaultNavigationTimeout(60000);
+            await page.goto(`https://www.google.com${address[index]}`, {
+              waitUntil: "networkidle2",
+              timeout: 0,
+            });
+            // await waitTillHTMLRendered(page);
+            console.log('getting tag..');
+            const links = await page.$$("a");
+            console.log("getting view more button");
+            const viewMoreUrl = await getLoadmoreButton(links);
+            if (viewMoreUrl) {
+              listUrlLv2.push(viewMoreUrl);
+              console.log("\x1b[32m%s\x1b[0m", `Added 1 ref url`);
+            }
+          } catch (error) {
+            console.log(error);
           }
-          if (finish < address?.length) {
-            console.log(finish);
-            finish++;
-          } else resolve();
-        } catch (error) {
-          // console.log(error);
         }
+      } catch (error) {
+        finish++;
+        console.log(error);
+        continue;
       }
+      if (finish < address?.length - 1) {
+        finish++;
+      } else resolve();
     }
   });
   return listUrlLv2;
 };
 const waitTillHTMLRendered = async (page, timeout = 30000) => {
-  const checkDurationMsecs = 1000;
+  const checkDurationMsecs = 800;
   const maxChecks = timeout / checkDurationMsecs;
   let lastHTMLSize = 0;
   let checkCounts = 1;
@@ -147,20 +159,20 @@ const waitTillHTMLRendered = async (page, timeout = 30000) => {
     let bodyHTMLSize = await page.evaluate(
       () => document.body.innerHTML.length
     );
-    console.log(
-      "last: ",
-      lastHTMLSize,
-      " <> curr: ",
-      currentHTMLSize,
-      " body html size: ",
-      bodyHTMLSize
-    );
+    // console.log(
+    //   "last: ",
+    //   lastHTMLSize,
+    //   " <> curr: ",
+    //   currentHTMLSize,
+    //   " body html size: ",
+    //   bodyHTMLSize
+    // );
     if (lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize)
       countStableSizeIterations++;
     else countStableSizeIterations = 0; //reset the counter
 
     if (countStableSizeIterations >= minStableSizeIterations) {
-      console.log("Page rendered fully..");
+      console.log("Page rendered..");
       break;
     }
     lastHTMLSize = currentHTMLSize;
@@ -209,7 +221,9 @@ const getLevel2RefAddressDetail = async (page, refUrls, key, dataDB) => {
         realUrls.push(imageUrl);
         Database.insert(dataDB, key, imageUrl);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
   return realUrls;
 };
@@ -235,12 +249,12 @@ const getLevel2RefAddress = async (page, urlList, key, dataDB) => {
           "\x1b[36m%s\x1b[0m",
           `Found ${Level2RefAddress.length} result at level 2`
         );
-        if (finish < urlList?.length) {
-          console.log(finish);
+        if (finish < urlList?.length - 1) {
           finish++;
         } else resolve(Level2RefAddress);
       } catch (error) {
-        // console
+        console.log(error);
+        continue;
       }
     }
   });

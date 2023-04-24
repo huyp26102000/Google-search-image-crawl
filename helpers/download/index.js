@@ -40,19 +40,20 @@ const downloadWithUrl = async (dataDB, url, id, index) => {
 
 const download = async (dataDB) => {
   const listdata = await database.getTableContent(dataDB);
-  console.log(listdata)
-  // listdata.forEach(async (element, i) => {
-  //   await downloadWithUrl(
-  //     dataDB,
-  //     element.url,
-  //     element.id,
-  //     `${i}/${listdata.length}`
-  //   );
-  //   console.log(
-  //     `Downloaded ${i}/${listdata.length}: ${element.url.substr(0, 64)}${
-  //       element.url.length > 64 ? "..." : null
-  //     } `
-  //   );
-  // });
+  listdata.forEach(async (element, i) => {
+    if (element?.url) {
+      await downloadWithUrl(
+        dataDB,
+        element.url,
+        element.id,
+        `${i}/${listdata.length}`
+      );
+      console.log(
+        `Downloaded ${i}/${listdata.length}: ${element.url.substr(0, 64)}${
+          element.url.length > 64 ? "..." : null
+        } `
+      );
+    }
+  });
 };
 export default { setup, download };
